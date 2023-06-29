@@ -1,0 +1,718 @@
+CREATE TABLE products (
+productsku VARCHAR(50),
+productname VARCHAR(255),
+orderedQuantity INTEGER,
+stockLevel INTEGER,
+restockingLeadTime INTEGER,
+sentimentScore DECIMAL,
+sentimentMagnitude DECIMAL
+)
+drop table analytics_new
+COPY products
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\products.csv'
+DELIMITER ','
+CSV HEADER;
+
+CREATE TABLE all_sessions (
+fullVisitorId INTEGER,
+channelGrouping VARCHAR(50),
+time TIME,
+country VARCHAR(50),
+city VARCHAR(50),
+totalTransactionRevenue INTEGER,
+transactions INTEGER,
+timeOnSite TIME,
+pageviews INTEGER,
+sessionQualityDim INTEGER,
+date_visited DATE,
+visitId INTEGER,
+type VARCHAR(10),
+productRefundAmount INTEGER,
+productsku VARCHAR(50),
+v2ProductName VARCHAR(255),
+v2ProductCategory VARCHAR(50),
+productVariant VARCHAR(50),
+currencyCode VARCHAR(10),
+pageTitle VARCHAR(255),
+pagePathLevel1 VARCHAR(255),
+eCommerceAction_type INTEGER,
+eCommerceAction_step INTEGER,
+eCommerceAction_option VARCHAR(10)
+)
+
+--fullVisitorId	channelGrouping	time	country	city	
+--totalTransactionRevenue	transactions	timeOnSite	pageviews	
+--sessionQualityDim	date_visited	visitId	type_	productRefundAmount	productsku	
+--v2ProductName	v2ProductCategory	productVariant	currencyCode	pageTitle	
+--pagePathLevel1	eCommerceAction_type	eCommerceAction_step	eCommerceAction_option
+fullVisitorId	channelGrouping	time	country	city	
+totalTransactionRevenue	transactions	timeOnSite	pageviews	
+sessionQualityDim	date_visited	visitId	productRefundAmount	productsku	
+v2ProductName	v2ProductCategory	productVariant	currencyCode	pageTitle	
+pagePathLevel1	eCommerceAction_type	eCommerceAction_step	eCommerceAction_option
+
+CREATE TABLE all_sessions (
+fullVisitorId VARCHAR(255),
+channelGrouping	VARCHAR(50),
+time VARCHAR(20),	
+country	VARCHAR(20),
+city VARCHAR(50),
+totalTransactionRevenue	INTEGER,
+transactions INTEGER,
+timeOnSite INTEGER,
+pageviews INTEGER,
+sessionQualityDim INTEGER,	
+date DATE,
+visitId	INTEGER,
+type VARCHAR(10),	
+productRefundAmount INTEGER,
+productQuantity	INTEGER,
+productPrice INTEGER,
+productRevenue INTEGER,	
+productSKU VARCHAR(20),
+v2ProductName VARCHAR(255),
+v2ProductCategory VARCHAR(50),
+productVariant VARCHAR(20),
+currencyCode VARCHAR(10),	
+itemQuantity INTEGER,
+itemRevenue	INTEGER,
+transactionRevenue INTEGER,
+transactionId VARCHAR(20),	
+pageTitle VARCHAR(1000),
+searchKeyword VARCHAR(10),	
+pagePathLevel1 VARCHAR(20),
+eCommerceAction_type INTEGER,	
+eCommerceAction_step INTEGER,	
+eCommerceAction_option VARCHAR(20)
+)
+
+COPY all_sessions
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\all_sessions.csv'
+DELIMITER ','
+CSV HEADER;
+--"C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\all_sessions.xlsx"
+drop table all_sessions
+select * from all_sessions
+
+CREATE TABLE sales_by_sku (
+productsku VARCHAR(50),
+total_ordered INTEGER
+--CONSTRAINT fk_products
+      --FOREIGN KEY(productsku) 
+	  --REFERENCES products(productsku)
+)
+
+COPY sales_by_sku
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\sales_by_sku.csv'
+DELIMITER ','
+CSV HEADER;
+
+CREATE TABLE sales_report (
+productsku VARCHAR(50),
+total_ordered INTEGER,
+productname VARCHAR(255),
+stockLevel INTEGER,
+restockingLeadTime INTEGER,
+sentimentScore DECIMAL,
+sentimentMagnitude DECIMAL,
+ratio DECIMAL
+)
+
+COPY sales_report
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\sales_report.csv'
+DELIMITER ','
+CSV HEADER;
+
+CREATE TABLE analytics (
+visitNumber VARCHAR(10),
+visitId INTEGER,
+visitStartTime INTEGER,
+date_visited DATE,
+fullvisitorId VARCHAR(20),
+userid INTEGER,
+channelGrouping VARCHAR(20),
+socialEngagementType VARCHAR(20),
+units_sold INTEGER,
+pageviews INTEGER,
+timeonsite INTEGER,
+bounces INTEGER,
+revenue BIGINT,
+unit_price INTEGER
+)
+
+COPY analytics
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\analytics.csv'
+DELIMITER ','
+CSV HEADER;
+
+UPDATE products
+SET productname = TRIM (productname)
+
+ALTER TABLE products
+    ADD CONSTRAINT products_pk PRIMARY KEY (productsku);
+
+--update sales_by_sku with the foreign key
+ALTER TABLE sales_by_sku
+    ADD CONSTRAINT sales_by_sku_fk FOREIGN KEY (productsku) REFERENCES products(productsku)
+SELECT * FROM all_sessions
+--Make time varchar to same digit for conversion to time/timeonsite data type 
+--after checking for the maximum lenght
+SELECT MAX(LENGTH(timeonsite)) FROM all_sessions
+
+ALTER TABLE all_sessions
+ALTER COLUMN timeonsite
+TYPE VARCHAR
+USING LPAD(time::VARCHAR, 6, '0');
+
+drop table all_sessions_new CASCADE
+UPDATE all_sessions
+
+UPDATE all_sessions
+SET time = SUBSTR(time, 1, 2)':'SUBSTR(time, 3, 2)':'SUBSTR(time, 5, 2);
+09:23:34
+				  
+ALTER TABLE public.all_sessions
+ALTER COLUMN time TYPE TIME USING time::TIME;
+				  
+select SUBSTR('987654', 1, 2)':'SUBSTR('987654', 3, 2)':'SUBSTR('987654', 5, 2);
+			  
+UPDATE public.all_sessions
+SET time = TIME '00:00:00' + 
+           INTERVAL '1 hour' * CAST(SUBSTR(time, 1, 2) AS INTEGER) +
+           INTERVAL '1 minute' * CAST(SUBSTR(time, 4, 2) AS INTEGER) +
+           INTERVAL '1 second' * CAST(SUBSTR(time, 7, 2) AS INTEGER);
+
+SELECT *
+FROM sales_report
+WHERE EXISTS
+(SELECT productsku FROM products WHERE sales_report.productsku = products.productsku);
+				  
+CREATE TABLE products_new (
+productsku VARCHAR(50),
+productname VARCHAR(255),
+orderedQuantity INTEGER,
+stockLevel INTEGER,
+restockingLeadTime INTEGER,
+sentimentScore DECIMAL,
+sentimentMagnitude DECIMAL
+)
+
+COPY products_new
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\New dataset\products_new.csv'
+DELIMITER ','
+CSV HEADER;				  
+
+CREATE TABLE all_sessions_new (
+fullVisitorId VARCHAR(255),
+channelGrouping	VARCHAR(50),
+time VARCHAR(20),	
+country	VARCHAR(20),
+city VARCHAR(50),
+totalTransactionRevenue	VARCHAR(255),
+transactions VARCHAR(255),
+timeOnSite VARCHAR(50),
+pageviews VARCHAR(50),
+sessionQualityDim VARCHAR(50),	
+date VARCHAR(50),
+visitId	VARCHAR(500),
+type VARCHAR(50),	
+productRefundAmount VARCHAR(255),
+productQuantity	VARCHAR(255),
+productPrice VARCHAR(50),
+productRevenue VARCHAR(255),	
+productsku VARCHAR(255),
+v2ProductName VARCHAR(255),
+v2ProductCategory VARCHAR(50),
+productVariant VARCHAR(20),
+currencyCode VARCHAR(50),	
+itemQuantity VARCHAR(255),
+itemRevenue	VARCHAR(20),
+transactionRevenue VARCHAR(255),
+transactionId VARCHAR(255),	
+pageTitle VARCHAR(1000),
+searchKeyword VARCHAR(50),	
+pagePathLevel1 VARCHAR(20),
+eCommerceAction_type INTEGER,	
+eCommerceAction_step INTEGER,	
+eCommerceAction_option VARCHAR(20)
+)
+drop table all_sessions_new				  
+COPY all_sessions_new
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\New dataset\all_sessions_new.csv'
+DELIMITER ','
+CSV HEADER;				  
+
+CREATE TABLE sales_by_sku_new (
+productsku VARCHAR(50),
+total_ordered INTEGER
+)	
+				  
+COPY sales_by_sku_new
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\New dataset\sales_by_sku_new.csv'
+DELIMITER ','
+CSV HEADER;					  
+
+CREATE TABLE sales_report_new (
+productsku VARCHAR(50),
+total_ordered INTEGER,
+productname VARCHAR(255),
+stockLevel INTEGER,
+restockingLeadTime INTEGER,
+sentimentScore DECIMAL,
+sentimentMagnitude DECIMAL,
+ratio VARCHAR(20)
+)
+
+COPY sales_report_new
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\New dataset\sales_report_new.csv'
+DELIMITER ','
+CSV HEADER;			
+				  
+CREATE TABLE analytics_new (
+visitNumber VARCHAR(10),
+visitId VARCHAR(255),
+visitStartTime INTEGER,
+date_visited DATE,
+fullvisitorId VARCHAR(20),
+userid VARCHAR(10),
+channelGrouping VARCHAR(20),
+socialEngagementType VARCHAR(20),
+units_sold VARCHAR(10),
+pageviews VARCHAR(20),
+timeonsite VARCHAR(10),
+bounces VARCHAR(20),
+revenue VARCHAR(255),
+unit_price INTEGER
+)
+				  
+COPY analytics_new
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\New dataset\analytics_new.csv'
+DELIMITER ','
+CSV HEADER;	
+				  
+ALTER TABLE products_new
+    ADD CONSTRAINT products_new_pk PRIMARY KEY (productsku);			
+
+ALTER TABLE sales_by_sku_new
+    ADD CONSTRAINT sales_by_sku_new_fk FOREIGN KEY (productsku) REFERENCES products_new(productsku)				  
+				  
+				  
+select Distinct(fullvisitorid) from all_sessions_new
+select * from all_sessions_new
+select Distinct(productsku) from products_new 
+select Distinct(productsku) from sales_by_sku_new 				  
+
+select * from all_sessions_new
+where EXISTS (select distinct(visitid) from all_sessions_new  
+--EXCEPT SELECT MIN(visitid) from all_sessions_new
+where all_sessions_new.visitid = all_sessions_new.visitid)
+
+SELECT * 
+FROM all_sessions_new a1 WHERE EXISTS (select distinct(visitid) from all_sessions_new a2 
+WHERE a1.visitid != a2.visitid) in (
+SELECT visitid FROM all_sessions_new group by visitid
+WHERE a3.visitid = a1.visitid)
+
+SELECT * FROM analytics_new
+WHERE EXISTS (SELECT visitid FROM all_sessions_new 
+			  WHERE analytics_new.visitid = all_sessions_new.visitid)
+
+SELECT * FROM all_sessions_new
+WHERE EXISTS (SELECT visitid FROM analytics_new 
+			  WHERE analytics_new.visitid = all_sessions_new.visitid)				  
+select * from all_sessions_new
+
+DELETE FROM all_sessions_new
+WHERE visitid IN (SELECT visitid FROM (SELECT visitid, ROW_NUMBER() OVER(PARTITION BY visitid ORDER BY
+visitid) AS row_num FROM all_sessions_new ORDER BY row_num DESC) sessions
+WHERE sessions.row_num >= 2)
+
+SELECT visitid, ROW_NUMBER() OVER(PARTITION BY visitid ORDER BY
+visitid DESC) AS row_num FROM all_sessions_new ORDER BY row_num DESC
+
+select * from all_sessions_new			  
+ALTER TABLE analytics_new
+ALTER COLUMN visitid
+TYPE VARCHAR
+USING visitid::VARCHAR
+				  
+ALTER TABLE all_sessions_new
+    ADD CONSTRAINT all_sessions_new_pk PRIMARY KEY (visitid);
+--add foreign key to analytics_new table
+ALTER TABLE analytics_new
+    ADD CONSTRAINT analytics_new_fk FOREIGN KEY (visitid) REFERENCES all_sessions_new(visitid);				  
+
+--add foreign key to analytics_new table
+ALTER TABLE sales_report_new
+    ADD CONSTRAINT sales_report_new_fk FOREIGN KEY (productsku) REFERENCES products(productsku);					  
+
+SELECT city, country, SUM(totalTransactionRevenue) AS total_revenue
+FROM all_sessions
+WHERE totalTransactionRevenue IS NOT NULL
+GROUP BY city, country
+ORDER BY total_revenue DESC;
+
+BEGIN;			  			  
+UPDATE all_sessions_new
+SET productprice = productprice/1000000;
+ROLLBACK;
+select * from all_sessions_new
+drop table all_sessions				  
+UPDATE all_sessions_new
+SET time TIME
+				  
+SELECT 20990000/1000000 as DECIMAL
+	
+
+-- verify the current range of lenght of time values				  
+SELECT MAX(LENGTH(time)), MIN(LENGTH(time)) FROM all_sessions_new
+									 
+--I will like to assume the time is in Hours, Minutes and Seconds for the time and timeonsite
+--variable since it is logical to spend hours on the sites rather than days.
+--I will like to change the strings to a six character string representing the Hour,Minute and Second
+ALTER TABLE all_sessions_new
+ALTER COLUMN time
+TYPE VARCHAR
+USING LPAD(time::VARCHAR, 6, '0');				  
+
+SELECT MAX(LENGTH(timeonsite)), MIN(LENGTH(timeonsite)) FROM all_sessions_new									 
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN timeonsite
+TYPE VARCHAR
+USING time::VARCHAR
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN timeonsite
+TYPE VARCHAR
+USING LPAD(time::VARCHAR, 6, '0');	
+
+select * from all_sessions_new
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN time
+TYPE INTEGER
+USING time::INTEGER;										   
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN timeonsite
+TYPE INTEGER
+USING timeonsite::INTEGER;
+										   
+-- check for mismatched country and city and update	
+SELECT DISTINCT(city),country FROM all_sessions_new
+WHERE country = 'United States'
+
+UPDATE all_sessions_new
+SET city = 'not available in demo dataset'
+WHERE city = '(not set)'
+										   
+drop table all_sessions_new CASCADE
+--add fk to all_sessions_new
+SELECT * FROM all_sessions_new
+WHERE EXISTS 
+(SELECT productsku FROM products_new WHERE products_new.productsku=all_sessions_new.productsku)
+
+ALTER TABLE all_sessions_new
+ADD CONSTRAINT all_sessions_new_fk FOREIGN KEY (productsku) REFERENCES products_new(productsku)
+
+SELECT DISTINCT(country) FROM all_sessions_new	
+
+SELECT * FROM all_sessions_new
+WHERE totaltransactionrevenue != 'NULL'	
+										   
+UPDATE all_sessions_new
+SET totaltransactionrevenue = NULL
+WHERE city = 'NULL'										   
+
+SELECT * FROM all_sessions_new
+WHERE productrefundamount = 'NULL'	
+										   
+ALTER TABLE all_sessions_new
+DROP COLUMN productrefundamount
+										   
+SELECT * FROM all_sessions_new
+WHERE productrevenue = 'NULL'	
+										   
+ALTER TABLE all_sessions_new
+DROP COLUMN productrevenue	
+										   
+SELECT * FROM all_sessions_new
+WHERE itemrevenue != 'NULL'	
+										   
+ALTER TABLE all_sessions_new
+DROP COLUMN itemrevenue
+
+SELECT * FROM all_sessions_new
+WHERE itemquantity = 'NULL'	
+										   
+ALTER TABLE all_sessions_new
+DROP COLUMN itemquantity										   
+		
+SELECT * FROM all_sessions_new
+WHERE ecommerceaction_option != 'NULL'	
+										   
+--For analytics
+SELECT * FROM analytics_new										   
+										   
+SELECT * FROM analytics_new
+WHERE userid = 'NULL'	
+										   
+ALTER TABLE analytics_new
+DROP COLUMN userid	
+										   
+SELECT * FROM analytics_new
+WHERE units_sold != 'NULL'
+										   
+SELECT * FROM analytics_new
+WHERE bounces != 'NULL'	
+										   
+SELECT * FROM analytics_new
+WHERE revenue != 'NULL'
+
+--for products										   
+SELECT distinct(productsku) FROM products
+SELECT * FROM products										   
+--for sales_by_sku
+SELECT * FROM sales_by_sku_new
+WHERE total_ordered IS NULL
+										   
+--for sales_report
+SELECT * FROM sales_report_new	
+
+-- find all duplicate records
+select fullvisitorid, count(fullvisitorid) as count_id from all_sessions_new
+group by fullvisitorid										   
+having count(fullvisitorid) > 1
+order by count_id desc
+select count(distinct(fullvisitorid)) from all_sessions_new					  
+					  
+-- find the total number of unique visitors (`fullVisitorID`)
+SELECT COUNT(DISTINCT(fullvisitorid)) from all_sessions_new		
+					  
+-- find the total number of unique visitors by referring sites
+select * from all_sessions_new					  
+select distinct(fullvisitorid), pageviews from all_sessions
+where pageviews > 0
+order by pageviews desc
+					  
+select count(distinct(fullvisitorid)) from all_sessions
+where channelgrouping = 'Referral'  
+				  
+-- find each unique product viewed by each visitor
+SELECT distinct(v2productname) from all_sessions_new
+where pageviews >= 0
+order by pageviews DESC
+-- compute the percentage of visitors to the site that actually makes a purchase
+select (sum(transactions)/count(*))*100
+from all_sessions_new
+where transactions IS NOT NULL
+
+UPDATE all_sessions_new
+SET transactions = NULL
+WHERE transactions = 'NULL'						  
+	
+ALTER TABLE all_sessions_new
+ALTER COLUMN transactions
+TYPE INTEGER
+USING transactions::INTEGER					  
+					  
+UPDATE all_sessions_new
+SET totaltransactionrevenue = NULL
+WHERE totaltransactionrevenue = 'NULL'					  
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN totaltransactionrevenue 
+TYPE INTEGER
+USING totaltransactionrevenue::INTEGER
+
+UPDATE all_sessions_new
+SET transactionrevenue = NULL
+WHERE transactionrevenue = 'NULL';					  
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN transactionrevenue 
+TYPE INTEGER
+USING transactionrevenue::INTEGER
+					  
+UPDATE all_sessions_new
+SET productquantity = NULL
+WHERE productquantity = 'NULL'					  
+
+ALTER TABLE all_sessions_new
+ALTER COLUMN productquantity 
+TYPE INTEGER
+USING productquantity::INTEGER					  
+
+UPDATE all_sessions_new
+SET sessionqualitydim = NULL
+WHERE sessionqualitydim = 'NULL'						  
+	
+ALTER TABLE all_sessions_new
+ALTER COLUMN sessionqualitydim
+TYPE INTEGER
+USING sessionqualitydim::INTEGER					  
+
+UPDATE analytics_new
+SET units_sold = NULL
+WHERE units_sold = 'NULL'						  
+	
+ALTER TABLE analytics_new
+ALTER COLUMN units_sold
+TYPE INTEGER
+USING units_sold::INTEGER								
+
+UPDATE analytics_new
+SET timeonsite = NULL
+WHERE timeonsite = 'NULL'						  
+	
+ALTER TABLE analytics_new
+ALTER COLUMN timeonsite
+TYPE INTEGER
+USING timeonsite::INTEGER
+								
+select * from all_sessions_new					  
+ALTER TABLE all_sessions_new
+ALTER COLUMN timeonsite
+TYPE VARCHAR
+USING time::VARCHAR					  
+					  
+
+--**Question 1: Which cities and countries have the highest level of transaction revenues on the site?*
+select city, country,sum(totaltransactionrevenue) as rev_level from all_sessions_new
+group by city, country
+having sum(totaltransactionrevenue) > 1 					  
+order by rev_level desc
+--**Question 2: What is the average number of products ordered from visitors in each city and country?**
+select * from sales_by_sku_new
+SELECT al.city, al.country, AVG(p.orderedquantity) AS avg_order
+FROM products_new p
+JOIN all_sessions_new al
+USING(productsku)
+GROUP BY al.city, al.country
+ORDER BY avg_order DESC
+
+SELECT al.city, al.country, AVG(s.total_ordered) AS avg_order
+FROM sales_by_sku_new s
+JOIN all_sessions_new al
+USING(productsku)
+GROUP BY al.city, al.country
+ORDER BY avg_order DESC								
+--**Question 3: Is there any pattern in the types (product categories) 
+--of products ordered from visitors in each city and country?**		
+SELECT DISTINCT(v2productcategory), city, count(city) as city_count, country, count(country) as country_count
+FROM all_sessions_new
+GROUP BY v2productcategory, city, country
+HAVING v2productcategory != '(not set)' AND v2productcategory != '${escCatTitle}'
+ORDER BY country_count
+
+SELECT DISTINCT(v2productcategory), count(v2productcategory) as cat_count
+FROM all_sessions_new
+GROUP BY v2productcategory
+HAVING v2productcategory != '(not set)' AND v2productcategory != '${escCatTitle}'
+ORDER BY cat_count DESC							
+
+								
+SELECT
+    a.country as country,
+    a.city as city,
+    a.v2ProductCategory as productcategory,
+    SUM(an.units_sold) as totalUnitsSold
+FROM all_sessions AS a
+JOIN analytics AS an ON a.visitId = an.visitId
+JOIN products AS p ON a.productsku = p.productsku
+WHERE a.country != '(not set)'
+    AND a.city != '(not set)'
+    AND a.v2ProductCategory != '(not set)'
+GROUP BY a.country, a.city, a.v2ProductCategory
+HAVING SUM(an.units_sold) IS NOT NULL
+ORDER BY a.country, a.city, totalUnitsSold DESC								
+								
+select * from analytics_new
+where units_sold is not NULL
+--**Question 4: What is the top-selling product from each city/country? 
+--Can we find any pattern worthy of noting in the products sold?**					  
+select * from analytics_new
+select * from products_new								
+SELECT p.productname, sum(an.units_sold) AS total_sold, al.city, al.country 
+FROM products p
+JOIN all_sessions_new al
+USING(productsku)
+JOIN analytics_new an
+USING(visitid)
+GROUP BY p.productname,al.city, al.country
+HAVING sum(an.units_sold) > 1
+ORDER BY total_sold DESC
+--LIMIT 3
+
+--**Question 5: Can we summarize the impact of revenue generated from each city/country?**
+select * from all_sessions_new								
+SELECT city, country, SUM(totaltransactionrevenue) AS total_rev
+FROM all_sessions_new
+GROUP BY city, country
+HAVING SUM(totaltransactionrevenue) >= 1
+ORDER BY total_rev DESC								
+								
+CREATE TABLE all_sessions_new (
+fullvisitorid VARCHAR(500),	
+channelgrouping VARCHAR(50),
+time VARCHAR(20),	
+country	VARCHAR(50),
+city VARCHAR(50),	
+totaltransactionrevenue VARCHAR(500),
+transactions VARCHAR(20),	
+timeonsite VARCHAR(50),	
+pageviews INTEGER,	
+sessionqualitydim VARCHAR(20),	
+date DATE,	
+visitid	VARCHAR(500),
+type VARCHAR(20),	
+productquantity VARCHAR(20),	
+productprice INTEGER,
+productsku VARCHAR(255),	
+v2productname VARCHAR(255),	
+v2productcategory VARCHAR(255),	
+productvariant VARCHAR(20),	
+currencycode VARCHAR(20),	
+transactionrevenue VARCHAR(20),	
+transactionid VARCHAR(20),	
+pagetitle VARCHAR(500),	
+searchkeyword VARCHAR(20),	
+pagepathlevel1 VARCHAR(255),	
+ecommerceaction_type INTEGER,	
+ecommerceaction_step INTEGER,	
+ecommerceaction_option VARCHAR(20)
+)
+					  
+COPY all_sessions_new
+FROM 'C:\Users\berna\OneDrive\Desktop\Assessments\Data Science Immersion\Lectures and Videos\SQL Project\New dataset\all_sessions_new.csv'
+DELIMITER ','
+CSV HEADER;						  
+
+select * from analytics_new			  
+SELECT channelgrouping, COUNT(channelgrouping) AS grp_count FROM analytics
+GROUP BY channelgrouping
+ORDER BY grp_count DESC
+LIMIT 5
+
+SELECT COUNT(DISTINCT(visitid)) FROM analytics_new
+					  
+SELECT p.productsku, s.productsku
+FROM products_new p
+INNER JOIN sales_by_sku s
+USING(productsku)
+					  
+SELECT p.productsku, al.productsku
+FROM products_new p
+INNER JOIN all_sessions_new al
+USING(productsku)
+					  
+SELECT an.visitid, al.visitid
+FROM analytics_new an
+INNER JOIN all_sessions_new al
+USING(visitid)	
+					  
+SELECT sr.productsku, s.productsku
+FROM sales_report sr
+INNER JOIN sales_by_sku_new s
+USING(productsku)						  
